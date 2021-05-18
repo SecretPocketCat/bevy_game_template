@@ -1,5 +1,5 @@
 use crate::actions::Actions;
-use crate::loading::AudioAssets;
+use crate::loading::GameAssets;
 use crate::GameState;
 use bevy::prelude::*;
 use bevy_kira_audio::{Audio, AudioChannel, AudioPlugin};
@@ -24,9 +24,9 @@ struct AudioChannels {
     flying: AudioChannel,
 }
 
-fn start_audio(audio_assets: Res<AudioAssets>, audio: Res<Audio>, channels: Res<AudioChannels>) {
+fn start_audio(game_assets: Res<GameAssets>, audio: Res<Audio>, channels: Res<AudioChannels>) {
     audio.set_volume_in_channel(0.3, &channels.flying);
-    audio.play_looped_in_channel(audio_assets.flying.clone(), &channels.flying);
+    audio.play_looped_in_channel(game_assets.flying.clone(), &channels.flying);
     audio.pause_channel(&channels.flying);
 }
 

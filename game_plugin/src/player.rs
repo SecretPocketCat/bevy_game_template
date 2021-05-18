@@ -1,5 +1,5 @@
 use crate::actions::Actions;
-use crate::loading::TextureAssets;
+use crate::loading::GameAssets;
 use crate::GameState;
 use bevy::prelude::*;
 
@@ -25,12 +25,13 @@ fn spawn_camera(mut commands: Commands) {
 
 fn spawn_player(
     mut commands: Commands,
-    textures: Res<TextureAssets>,
+    game_assets: Res<GameAssets>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
+    println!("spawning");
     commands
         .spawn_bundle(SpriteBundle {
-            material: materials.add(textures.texture_bevy.clone().into()),
+            material: materials.add(game_assets.texture_bevy.clone().into()),
             transform: Transform::from_translation(Vec3::new(0., 0., 1.)),
             ..Default::default()
         })

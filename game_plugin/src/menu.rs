@@ -1,5 +1,6 @@
 use crate::GameState;
 use bevy::prelude::*;
+use crate::loading::GameAssets;
 
 pub struct MenuPlugin;
 
@@ -32,7 +33,7 @@ struct PlayButton;
 
 fn setup_menu(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
+    game_assets: Res<GameAssets>,
     button_materials: Res<ButtonMaterials>,
 ) {
     commands.spawn_bundle(UiCameraBundle::default());
@@ -55,7 +56,7 @@ fn setup_menu(
                     sections: vec![TextSection {
                         value: "Play".to_string(),
                         style: TextStyle {
-                            font: asset_server.get_handle("fonts/FiraSans-Bold.ttf"),
+                            font: game_assets.fira_sans.clone(),
                             font_size: 40.0,
                             color: Color::rgb(0.9, 0.9, 0.9),
                         },
