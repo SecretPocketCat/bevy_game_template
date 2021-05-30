@@ -281,7 +281,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_asset_loader"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "bevy",
  "bevy_asset_loader_derive",
@@ -289,7 +289,7 @@ dependencies = [
 
 [[package]]
 name = "bevy_asset_loader_derive"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "proc-macro2",
  "quote",
