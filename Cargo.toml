@@ -1,8 +1,9 @@
 [package]
-name = "bevy_game" # ToDo
+# todo:
+name = "bevy_game"
 version = "0.1.0"
 publish = false
-authors = ["Niklas Eicker <git@nikl.me>"] # ToDo: you are the author ;)
+authors = ["SecretPocketCat"]
 edition = "2021"
 
 [profile.dev.package."*"]
@@ -15,27 +16,50 @@ opt-level = 1
 lto = true
 codegen-units = 1
 
-[features]
-default = [
-    "bevy/bevy_winit",
-    "bevy/render",
-    "bevy/png",
-    "bevy/x11",
-    "bevy_kira_audio/ogg"
-]
-
-dev = [
-    "bevy/dynamic",
-]
-
 [dependencies]
-bevy = { version = "0.6", default-features = false }
-bevy_kira_audio = { version = "0.8" }
-bevy_asset_loader = { version = "0.9" }
-rand = "0.8.3"
+bevy_input = { git = "https://github.com/SecretPocketCat/bevy_input", features = [
+    "multiplayer",
+] }
+bevy_extensions = { git = "https://github.com/SecretPocketCat/bevy_extensions" }
+bevy_time = { git = "https://github.com/SecretPocketCat/bevy_time" }
+bevy_asset_loader = { version = "0.9.0" }
+bevy-inspector-egui = { version = "0.9.0" }
+bevy_tweening = "0.3.3"
+bevy_prototype_lyon = "0.4.0"
+heron = { version = "2.3.0", features = ["2d"] }
+interpolation = "0.2.0"
+rand = "0.8.5"
+# 0.9.8 was broken for me was the nighly I was using ):
+crossbeam-epoch = "=0.9.7"
 
-[target.'cfg(target_os = "linux")'.dependencies]
-winit = { version = "0.25", features=["x11"]}
+[dependencies.bevy]
+version = "0.6"
+default-features = false
+# https://bevy-cheatbook.github.io/setup/bevy-config.html?highlight=audio#bevy-cargo-features
+# These are the remaining default features other than `bevy_audio` and `mp3`
+features = [
+    "bevy_winit",
+    "bevy_gilrs",
+    "png",
+    "filesystem_watcher",
+    "x11",
+    # render-related features
+    "bevy_render",
+    "bevy_core_pipeline",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+]
+
+[dependencies.bevy_kira_audio]
+version = "0.8.0"
+default-features = false
+features = ["ogg"]
 
 [build-dependencies]
-embed-resource = "1.4"
+embed-resource = "1.7.1"
+
+[features]
+dev = ["bevy/dynamic"]
+debug = ["dev"]
+gizmos = ["heron/debug-2d"]
