@@ -8,28 +8,28 @@ pub struct LoadingPlugin;
 impl Plugin for LoadingPlugin {
     fn build(&self, app: &mut App) {
         AssetLoader::new(GameState::Loading)
-            .with_collection::<FontAssets>()
-            .with_collection::<AudioAssets>()
-            .with_collection::<TextureAssets>()
+            .with_collection::<Fonts>()
+            .with_collection::<Audio>()
+            .with_collection::<Sprites>()
             .continue_to_state(GameState::Menu)
             .build(app);
     }
 }
 
 #[derive(AssetCollection)]
-pub struct FontAssets {
+pub struct Fonts {
     #[asset(path = "fonts/FiraSans-Bold.ttf")]
     pub fira_sans: Handle<Font>,
 }
 
 #[derive(AssetCollection)]
-pub struct AudioAssets {
+pub struct Audio {
     #[asset(path = "audio/sfx", folder)]
     _sfx: Vec<HandleUntyped>,
 }
 
 #[derive(AssetCollection)]
-pub struct TextureAssets {
+pub struct Sprites {
     #[asset(path = "sprites/bevy_logo.png")]
-    pub texture_bevy: Handle<Image>,
+    pub bevy_logo: Handle<Image>,
 }

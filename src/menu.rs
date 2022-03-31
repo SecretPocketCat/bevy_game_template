@@ -1,19 +1,17 @@
-use std::time::Duration;
-
+use crate::assets::Sprites;
 use crate::palette::{Palette, PaletteColor};
 use crate::pause::Inactive;
 use crate::tween::delay_tween;
 use crate::GameState;
-use crate::{loading::FontAssets, tween::UiColorLens};
+use crate::{assets::Fonts, tween::UiColorLens};
 use bevy::prelude::*;
 use bevy::ui::FocusPolicy;
-use bevy_extensions::Vec2Conversion;
 use bevy_tweening::lens::{TransformPositionLens, TransformScaleLens, UiPositionLens};
 use bevy_tweening::{component_animator_system, Animator, EaseFunction, Lens, Tracks, Tween};
+use std::time::Duration;
 
 // todo:
 // tabindex (Resource?)
-// todo: img logo
 
 pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
@@ -107,9 +105,10 @@ pub struct ButtonClickEvt {
 
 fn setup_menu(
     mut commands: Commands,
-    font_assets: Res<FontAssets>,
+    font_assets: Res<Fonts>,
     button_colors: Res<ButtonInteractionStyles>,
     palette: Res<Palette>,
+    sprites: Res<Sprites>,
 ) {
     commands.spawn_bundle(UiCameraBundle::default());
 
@@ -121,16 +120,29 @@ fn setup_menu(
                 margin: Rect::all(Val::Auto),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
+                flex_direction: FlexDirection::ColumnReverse,
                 ..Default::default()
             },
             color: Color::NONE.into(),
             ..Default::default()
         })
         .with_children(|b| {
+            b.spawn_bundle(ImageBundle {
+                image: sprites.bevy_logo.clone().into(),
+                style: Style {
+                    max_size: Size::new(Val::Percent(100.), Val::Percent(30.)),
+                    margin: Rect::all(Val::Auto),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..Default::default()
+                },
+                ..Default::default()
+            });
+
             // btns root
             b.spawn_bundle(NodeBundle {
                 style: Style {
-                    size: Size::new(Val::Percent(100.), Val::Percent(100.)),
+                    size: Size::new(Val::Percent(100.), Val::Auto),
                     margin: Rect::all(Val::Auto),
                     flex_direction: FlexDirection::ColumnReverse,
                     justify_content: JustifyContent::Center,
@@ -141,9 +153,6 @@ fn setup_menu(
                 ..Default::default()
             })
             .with_children(|b| {
-                // btns
-                // todo: different sizes & colors just to make play more prominent?
-                // pick an accent col?
                 let base_btn_margin = 15.;
 
                 for (text, action, margin_btm, size_mult, is_accent) in [
@@ -171,7 +180,7 @@ fn setup_menu(
                     (
                         "Quit",
                         ButtonAction::ChangeState(GameState::Quit),
-                        0.,
+                        50.,
                         1.,
                         false,
                     ),
@@ -245,7 +254,7 @@ fn setup_menu(
                         b.spawn_bundle(TextBundle {
                             text: Text {
                                 sections: vec![TextSection {
-                                    value: text.to_string(),
+                                    value: text.to_string().to_uppercase(),
                                     style: TextStyle {
                                         font: font_assets.fira_sans.clone(),
                                         font_size: 40.0 * *size_mult,

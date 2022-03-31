@@ -13,7 +13,7 @@ use bevy_tweening::TweeningPlugin;
 use debug::DebugPlugin;
 use game_state::GameState;
 use heron::PhysicsPlugin;
-use loading::LoadingPlugin;
+use assets::LoadingPlugin;
 use menu::MenuPlugin;
 use palette::PalettePlugin;
 use pause::PausePlugin;
@@ -22,7 +22,7 @@ use sfx::SfxPlugin;
 
 mod debug;
 mod game_state;
-mod loading;
+mod assets;
 mod menu;
 mod palette;
 mod pause;
