@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::palette::{Palette, PaletteColor};
 use crate::pause::Inactive;
 use crate::GameState;
 use crate::{loading::FontAssets, tween::UiColorLens};
@@ -18,7 +19,7 @@ use bevy_tweening::{component_animator_system, Animator, EaseFunction, Lens, Tra
 pub struct MenuPlugin;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<ButtonStyle>()
+        app.init_resource::<ButtonInteractionStyles>()
             .add_event::<ButtonClickEvt>()
             .add_system(component_animator_system::<UiColor>)
             .add_system_set(SystemSet::on_enter(GameState::Menu).with_system(setup_menu))
@@ -32,49 +33,53 @@ enum ButtonAction {
     ChangeState(GameState),
 }
 
-struct ButtonInteractionStyle {
-    color: Color,
-    text_color: Color,
+#[derive(Clone, Copy)]
+struct ButtonStyle {
+    color: PaletteColor,
+    text_color: PaletteColor,
     scale: Vec2,
     position: Rect<Val>,
-}
-
-impl Default for ButtonInteractionStyle {
-    fn default() -> Self {
-        Self {
-            scale: Vec2::ONE,
-            color: Color::BLACK,
-            text_color: Color::WHITE,
-            position: Rect::all(Val::Px(0.)),
-        }
-    }
-}
-
-struct ButtonStyle {
-    normal: ButtonInteractionStyle,
-    hover: ButtonInteractionStyle,
-    active: ButtonInteractionStyle,
-    // todo
-    // focus: UiColor,
+    delay_ms: u32,
 }
 
 impl Default for ButtonStyle {
     fn default() -> Self {
+        Self {
+            scale: Vec2::ONE,
+            color: PaletteColor::Button,
+            text_color: PaletteColor::ButtonText,
+            position: Rect::all(Val::Px(0.)),
+            delay_ms: 0,
+        }
+    }
+}
+
+#[derive(Component, Clone, Copy)]
+struct ButtonInteractionStyles {
+    normal: ButtonStyle,
+    focus: ButtonStyle,
+    active: ButtonStyle,
+}
+
+impl Default for ButtonInteractionStyles {
+    fn default() -> Self {
         let mut active_pos = Rect::all(Val::Px(0.));
         active_pos.top = Val::Px(10.);
 
-        ButtonStyle {
-            normal: ButtonInteractionStyle {
-                color: Color::rgb(0.15, 0.15, 0.15),
+        ButtonInteractionStyles {
+            normal: ButtonStyle {
                 ..Default::default()
             },
-            hover: ButtonInteractionStyle {
-                color: Color::rgb(0.25, 0.25, 0.25),
+            focus: ButtonStyle {
+                color: PaletteColor::ButtonFocus,
+                text_color: PaletteColor::ButtonTextFocus,
                 scale: Vec2::new(1.1, 0.9),
+                delay_ms: 50,
                 ..Default::default()
             },
-            active: ButtonInteractionStyle {
-                color: Color::rgb(0.65, 0.65, 0.65),
+            active: ButtonStyle {
+                color: PaletteColor::ButtonActive,
+                text_color: PaletteColor::ButtonTextActive,
                 scale: Vec2::new(1.25, 0.75),
                 position: active_pos,
                 ..Default::default()
@@ -83,13 +88,17 @@ impl Default for ButtonStyle {
     }
 }
 
-impl ButtonStyle {
-    pub fn get_interaction_style(&self, interaction: Interaction) -> &ButtonInteractionStyle {
+impl ButtonInteractionStyles {
+    pub fn get_interaction_style(&self, interaction: Interaction) -> &ButtonStyle {
         match interaction {
             Interaction::Clicked => &self.active,
-            Interaction::Hovered => &self.hover,
+            Interaction::Hovered => &self.focus,
             Interaction::None => &self.normal,
         }
+    }
+
+    pub fn get_override_or_self<'a>(&'a self, style_override: Option<&'a Self>) -> &Self {
+        style_override.unwrap_or(self)
     }
 }
 
@@ -100,7 +109,8 @@ pub struct ButtonClickEvt {
 fn setup_menu(
     mut commands: Commands,
     font_assets: Res<FontAssets>,
-    button_colors: Res<ButtonStyle>,
+    button_colors: Res<ButtonInteractionStyles>,
+    palette: Res<Palette>,
 ) {
     commands.spawn_bundle(UiCameraBundle::default());
 
@@ -137,26 +147,35 @@ fn setup_menu(
                 // pick an accent col?
                 let base_btn_margin = 15.;
 
-                for (text, action, margin_btm, size_mult) in [
+                for (text, action, margin_btm, size_mult, is_accent) in [
                     (
                         "Play",
                         ButtonAction::ChangeState(GameState::Game),
                         base_btn_margin * 3.,
                         1.5,
+                        true,
                     ),
                     (
                         "Tutorial",
                         ButtonAction::ChangeState(GameState::Tutorial),
                         base_btn_margin,
                         1.,
+                        false,
                     ),
                     (
                         "Settings",
                         ButtonAction::ChangeState(GameState::Settings),
                         base_btn_margin * 2.,
                         1.,
+                        false,
                     ),
-                    ("Quit", ButtonAction::ChangeState(GameState::Quit), 0., 1.),
+                    (
+                        "Quit",
+                        ButtonAction::ChangeState(GameState::Quit),
+                        0.,
+                        1.,
+                        false,
+                    ),
                 ]
                 .iter()
                 {
@@ -183,7 +202,7 @@ fn setup_menu(
                         ..Default::default()
                     })
                     .with_children(|b| {
-                        b.spawn_bundle(ButtonBundle {
+                        let mut btn = b.spawn_bundle(ButtonBundle {
                             style: Style {
                                 size: Size::new(Val::Percent(100.), Val::Percent(100.)),
                                 position_type: PositionType::Absolute,
@@ -191,10 +210,38 @@ fn setup_menu(
                                 align_items: AlignItems::Center,
                                 ..Default::default()
                             },
-                            color: button_colors.normal.color.into(),
+                            color: palette.get_color(&button_colors.normal.color).into(),
                             ..Default::default()
-                        })
-                        .insert(*action);
+                        });
+
+                        btn.insert(*action);
+
+                        if *is_accent {
+                            btn.insert(ButtonInteractionStyles {
+                                normal: ButtonStyle {
+                                    color: PaletteColor::ButtonAccent,
+                                    text_color: PaletteColor::ButtonTextAccent,
+                                    ..Default::default()
+                                },
+                                focus: ButtonStyle {
+                                    color: PaletteColor::ButtonAccentFocus,
+                                    text_color: PaletteColor::ButtonTextAccentFocus,
+                                    scale: Vec2::new(1.1, 0.9),
+                                    delay_ms: 50,
+                                    ..Default::default()
+                                },
+                                active: ButtonStyle {
+                                    color: PaletteColor::ButtonAccentActive,
+                                    text_color: PaletteColor::ButtonTextAccentActive,
+                                    scale: Vec2::new(1.25, 0.75),
+                                    position: Rect {
+                                        top: Val::Px(20.),
+                                        ..Default::default()
+                                    },
+                                    ..Default::default()
+                                },
+                            });
+                        }
 
                         b.spawn_bundle(TextBundle {
                             text: Text {
@@ -203,7 +250,7 @@ fn setup_menu(
                                     style: TextStyle {
                                         font: font_assets.fira_sans.clone(),
                                         font_size: 40.0 * *size_mult,
-                                        color: Color::rgb(0.9, 0.9, 0.9),
+                                        color: palette.get_color(&button_colors.normal.text_color),
                                     },
                                 }],
                                 alignment: Default::default(),
@@ -219,15 +266,23 @@ fn setup_menu(
 
 fn handle_button_interaction(
     mut commands: Commands,
-    button_style: Res<ButtonStyle>,
+    button_style: Res<ButtonInteractionStyles>,
     mut interaction_q: Query<
-        (Entity, &Interaction, &UiColor, &Transform, &Parent),
+        (
+            Entity,
+            &Interaction,
+            &UiColor,
+            &Transform,
+            Option<&ButtonInteractionStyles>,
+            &Parent,
+        ),
         (Changed<Interaction>, Without<Inactive>),
     >,
     style_q: Query<&Style>,
     mut click_evw: EventWriter<ButtonClickEvt>,
+    palette: Res<Palette>,
 ) {
-    for (button_e, interaction, ui_col, t, parent) in interaction_q.iter_mut() {
+    for (button_e, interaction, ui_col, t, btn_style_override, parent) in interaction_q.iter_mut() {
         if let Interaction::Clicked = interaction {
             commands.entity(button_e).insert(Inactive::Timed {
                 timer: Timer::from_seconds(0.4, false),
@@ -243,7 +298,10 @@ fn handle_button_interaction(
                 ui_col.0,
                 t.scale,
                 style.position,
-                button_style.get_interaction_style(*interaction),
+                button_style
+                    .get_override_or_self(btn_style_override)
+                    .get_interaction_style(*interaction),
+                &palette,
             );
         }
     }
@@ -251,13 +309,25 @@ fn handle_button_interaction(
 
 fn reactivate_button(
     mut commands: Commands,
-    button_colors: Res<ButtonStyle>,
+    button_style: Res<ButtonInteractionStyles>,
     removed: RemovedComponents<Inactive>,
-    interaction_q: Query<(&Interaction, &UiColor, &Transform, &Parent), With<Button>>,
+    interaction_q: Query<
+        (
+            &Interaction,
+            &UiColor,
+            &Transform,
+            Option<&ButtonInteractionStyles>,
+            &Parent,
+        ),
+        With<Button>,
+    >,
     style_q: Query<&Style>,
+    palette: Res<Palette>,
 ) {
     for inactive_e in removed.iter() {
-        if let Ok((interaction, ui_col, t, parent)) = interaction_q.get(inactive_e) {
+        if let Ok((interaction, ui_col, t, btn_style_override, parent)) =
+            interaction_q.get(inactive_e)
+        {
             if let Ok(style) = style_q.get(parent.0) {
                 tween_button(
                     &mut commands,
@@ -266,13 +336,18 @@ fn reactivate_button(
                     ui_col.0,
                     t.scale,
                     style.position,
-                    button_colors.get_interaction_style(*interaction),
+                    button_style
+                        .get_override_or_self(btn_style_override)
+                        .get_interaction_style(*interaction),
+                    &palette,
                 );
             }
         }
     }
 }
 
+// todo: add slight delay to tween
+// todo: tween text
 fn tween_button(
     commands: &mut Commands,
     button_e: Entity,
@@ -280,7 +355,8 @@ fn tween_button(
     start_color: Color,
     start_scale: Vec3,
     start_ui_pos: Rect<Val>,
-    style: &ButtonInteractionStyle,
+    style: &ButtonStyle,
+    palette: &Palette,
 ) {
     commands
         .entity(button_e)
@@ -290,7 +366,7 @@ fn tween_button(
             Duration::from_millis(350),
             UiColorLens {
                 start: start_color,
-                end: style.color,
+                end: palette.get_color(&style.color),
             },
         )))
         .insert(Animator::new(Tween::new(

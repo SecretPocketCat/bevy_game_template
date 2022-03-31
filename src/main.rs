@@ -15,6 +15,7 @@ use game_state::GameState;
 use heron::PhysicsPlugin;
 use loading::LoadingPlugin;
 use menu::MenuPlugin;
+use palette::PalettePlugin;
 use pause::PausePlugin;
 use render::GameDimensions;
 use sfx::SfxPlugin;
@@ -23,6 +24,7 @@ mod debug;
 mod game_state;
 mod loading;
 mod menu;
+mod palette;
 mod pause;
 mod render;
 mod sfx;
@@ -86,6 +88,7 @@ fn main() {
     app.add_plugin(LoadingPlugin)
         .add_plugin(MenuPlugin)
         .add_plugin(PausePlugin)
+        .add_plugin(PalettePlugin)
         .add_plugin(SfxPlugin);
 
     app.run();
