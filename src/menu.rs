@@ -2,6 +2,7 @@ use std::time::Duration;
 
 use crate::palette::{Palette, PaletteColor};
 use crate::pause::Inactive;
+use crate::tween::delay_tween;
 use crate::GameState;
 use crate::{loading::FontAssets, tween::UiColorLens};
 use bevy::prelude::*;
@@ -11,8 +12,6 @@ use bevy_tweening::lens::{TransformPositionLens, TransformScaleLens, UiPositionL
 use bevy_tweening::{component_animator_system, Animator, EaseFunction, Lens, Tracks, Tween};
 
 // todo:
-// use palette
-// different btn colors
 // tabindex (Resource?)
 // todo: img logo
 
@@ -39,7 +38,7 @@ struct ButtonStyle {
     text_color: PaletteColor,
     scale: Vec2,
     position: Rect<Val>,
-    delay_ms: u32,
+    delay_ms: u64,
 }
 
 impl Default for ButtonStyle {
@@ -346,7 +345,6 @@ fn reactivate_button(
     }
 }
 
-// todo: add slight delay to tween
 // todo: tween text
 fn tween_button(
     commands: &mut Commands,
@@ -360,34 +358,43 @@ fn tween_button(
 ) {
     commands
         .entity(button_e)
-        .insert(Animator::new(Tween::new(
-            EaseFunction::QuadraticInOut,
-            bevy_tweening::TweeningType::Once,
-            Duration::from_millis(350),
-            UiColorLens {
-                start: start_color,
-                end: palette.get_color(&style.color),
-            },
+        .insert(Animator::new(delay_tween(
+            Tween::new(
+                EaseFunction::QuadraticInOut,
+                bevy_tweening::TweeningType::Once,
+                Duration::from_millis(350),
+                UiColorLens {
+                    start: start_color,
+                    end: palette.get_color(&style.color),
+                },
+            ),
+            style.delay_ms,
         )))
-        .insert(Animator::new(Tween::new(
-            EaseFunction::BackOut,
-            bevy_tweening::TweeningType::Once,
-            Duration::from_millis(350),
-            TransformScaleLens {
-                start: start_scale,
-                end: style.scale.extend(start_scale.z),
-            },
+        .insert(Animator::new(delay_tween(
+            Tween::new(
+                EaseFunction::BackOut,
+                bevy_tweening::TweeningType::Once,
+                Duration::from_millis(350),
+                TransformScaleLens {
+                    start: start_scale,
+                    end: style.scale.extend(start_scale.z),
+                },
+            ),
+            style.delay_ms,
         )));
 
     commands
         .entity(button_root_e)
-        .insert(Animator::new(Tween::new(
-            EaseFunction::BackOut,
-            bevy_tweening::TweeningType::Once,
-            Duration::from_millis(350),
-            UiPositionLens {
-                start: start_ui_pos,
-                end: style.position,
-            },
+        .insert(Animator::new(delay_tween(
+            Tween::new(
+                EaseFunction::BackOut,
+                bevy_tweening::TweeningType::Once,
+                Duration::from_millis(350),
+                UiPositionLens {
+                    start: start_ui_pos,
+                    end: style.position,
+                },
+            ),
+            style.delay_ms,
         )));
 }
