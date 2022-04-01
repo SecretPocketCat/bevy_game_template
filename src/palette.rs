@@ -20,12 +20,12 @@ impl Plugin for PalettePlugin {
                 button_accent: Color::rgb_u8(0, 68, 115),
                 button_accent_focus: Color::rgb_u8(0, 60, 150),
                 button_accent_active: Color::rgb_u8(54, 0, 162),
-                button_text: Color::hsl(0., 0., 1.),
-                button_text_focus: Color::hsl(0., 0., 1.),
-                button_text_active: Color::hsl(0., 0., 1.),
-                button_text_accent: Color::hsl(0., 0., 1.),
-                button_text_accent_focus: Color::hsl(0., 0., 1.),
-                button_text_accent_active: Color::hsl(0., 0., 1.),
+                button_text: Color::hsl(0., 0., 0.75),
+                button_text_focus: Color::hsl(0., 0., 0.85),
+                button_text_active: Color::hsl(0., 0., 0.95),
+                button_text_accent: Color::hsl(0., 0., 0.75),
+                button_text_accent_focus: Color::hsl(0., 0., 0.85),
+                button_text_accent_active: Color::hsl(0., 0., 0.95),
             });
     }
 }

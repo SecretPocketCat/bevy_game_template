@@ -3,8 +3,10 @@
 #![feature(derive_default_enum)]
 #![feature(if_let_guard)]
 #![feature(drain_filter)]
+#![feature(const_fn_trait_bound)]
 #![allow(clippy::type_complexity, clippy::too_many_arguments)]
 
+use assets::LoadingPlugin;
 use bevy::{prelude::*, window::WindowResizeConstraints};
 use bevy_kira_audio::AudioPlugin;
 use bevy_prototype_lyon::plugin::ShapePlugin;
@@ -13,16 +15,17 @@ use bevy_tweening::TweeningPlugin;
 use debug::DebugPlugin;
 use game_state::GameState;
 use heron::PhysicsPlugin;
-use assets::LoadingPlugin;
+use input_binding::InputBindingPlugin;
 use menu::MenuPlugin;
 use palette::PalettePlugin;
 use pause::PausePlugin;
 use render::GameDimensions;
 use sfx::SfxPlugin;
 
+mod assets;
 mod debug;
 mod game_state;
-mod assets;
+mod input_binding;
 mod menu;
 mod palette;
 mod pause;
@@ -86,6 +89,7 @@ fn main() {
 
     // game plugins
     app.add_plugin(LoadingPlugin)
+        .add_plugin(InputBindingPlugin)
         .add_plugin(MenuPlugin)
         .add_plugin(PausePlugin)
         .add_plugin(PalettePlugin)
