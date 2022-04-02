@@ -6,21 +6,22 @@
 #![feature(const_fn_trait_bound)]
 #![allow(clippy::type_complexity, clippy::too_many_arguments)]
 
-use assets::LoadingPlugin;
+use assets::AssetsPlugin;
 use bevy::{prelude::*, window::WindowResizeConstraints};
 use bevy_kira_audio::AudioPlugin;
 use bevy_prototype_lyon::plugin::ShapePlugin;
 use bevy_time::TimePlugin;
 use bevy_tweening::TweeningPlugin;
 use debug::DebugPlugin;
-use game_state::GameState;
+use game_state::{GameState, GameStatePlugin};
 use heron::PhysicsPlugin;
 use input_binding::InputBindingPlugin;
 use menu::MenuPlugin;
 use palette::PalettePlugin;
 use pause::PausePlugin;
-use render::GameDimensions;
+use render::{GameDimensions, RenderPlugin};
 use sfx::SfxPlugin;
+use tween::TweenPlugin;
 
 mod assets;
 mod debug;
@@ -88,11 +89,14 @@ fn main() {
     app.add_plugin(TimePlugin);
 
     // game plugins
-    app.add_plugin(LoadingPlugin)
+    app.add_plugin(RenderPlugin)
+        .add_plugin(AssetsPlugin)
+        .add_plugin(GameStatePlugin)
         .add_plugin(InputBindingPlugin)
         .add_plugin(MenuPlugin)
         .add_plugin(PausePlugin)
         .add_plugin(PalettePlugin)
+        .add_plugin(TweenPlugin)
         .add_plugin(SfxPlugin);
 
     app.run();

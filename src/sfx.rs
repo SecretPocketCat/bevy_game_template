@@ -4,7 +4,7 @@ use bevy::{ecs::system::Resource, prelude::*};
 use bevy_kira_audio::{Audio, AudioChannel};
 use rand::*;
 
-use crate::menu::ButtonClickEvt;
+use crate::menu::ButtonActiveEvt;
 
 pub struct SfxPlugin;
 impl Plugin for SfxPlugin {
@@ -21,7 +21,10 @@ impl Plugin for SfxPlugin {
                 CoreStage::Last,
                 SystemSet::new()
                     .label(SfxPhase::PrepareQueue)
-                    .with_system(proxy_as_sfx_event::<ButtonClickEvt>("click".to_owned(), 13)),
+                    .with_system(proxy_as_sfx_event::<ButtonActiveEvt>(
+                        "click".to_owned(),
+                        13,
+                    )),
             );
     }
 }
@@ -36,9 +39,9 @@ pub trait SfxEvt {
     fn get_volume(&self) -> f32;
 }
 
-impl SfxEvt for ButtonClickEvt {
+impl SfxEvt for ButtonActiveEvt {
     fn get_volume(&self) -> f32 {
-        0.3
+        0.5
     }
 }
 

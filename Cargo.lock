@@ -315,27 +315,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy_asset_loader"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c66ad231244301f2102277fd3b189d75a9c875c79fdf1f94953ad51bdd72c2b"
-dependencies = [
- "bevy",
- "bevy_asset_loader_derive",
-]
-
-[[package]]
-name = "bevy_asset_loader_derive"
-version = "0.9.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92c9e041d416fbe57cd63a5c0ee5b46afa2fedefc4e9c96bb830358bc12a166b"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
 name = "bevy_core"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -469,13 +448,13 @@ version = "0.1.0"
 dependencies = [
  "bevy",
  "bevy-inspector-egui",
- "bevy_asset_loader",
  "bevy_extensions",
  "bevy_input 0.1.3",
  "bevy_kira_audio",
  "bevy_prototype_lyon",
  "bevy_time",
  "bevy_tweening",
+ "dyn-fmt",
  "embed-resource",
  "heron",
  "indexmap",
@@ -1468,6 +1447,12 @@ dependencies = [
  "heck",
  "proc-macro-error",
 ]
+
+[[package]]
+name = "dyn-fmt"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2a0836c9bd73a9d3ca55b0effc5b1eedf96dd13ef994389bcac6d4d33c46188"
 
 [[package]]
 name = "egui"

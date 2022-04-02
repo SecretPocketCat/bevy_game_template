@@ -21,6 +21,13 @@
       "args": ["--features", "dev,debug,gizmos"],
       "problemMatcher": ["$rustc"],
       "label": "bevy: run dynamic debug with gizmos"
+    },
+    {
+      "type": "cargo",
+      "command": "run",
+      "args": ["--features", "dev_full"],
+      "problemMatcher": ["$rustc"],
+      "label": "bevy: run dynamic from splash to menu"
     }
   ]
 }
