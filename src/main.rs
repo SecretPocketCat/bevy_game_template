@@ -17,6 +17,7 @@ use game_state::{GameState, GameStatePlugin};
 use heron::PhysicsPlugin;
 use input_binding::InputBindingPlugin;
 use menu::MenuPlugin;
+use mouse::MousePlugin;
 use palette::PalettePlugin;
 use pause::PausePlugin;
 use render::{GameDimensions, RenderPlugin};
@@ -28,6 +29,7 @@ mod debug;
 mod game_state;
 mod input_binding;
 mod menu;
+mod mouse;
 mod palette;
 mod pause;
 mod render;
@@ -94,6 +96,7 @@ fn main() {
         .add_plugin(GameStatePlugin)
         .add_plugin(InputBindingPlugin)
         .add_plugin(MenuPlugin)
+        .add_plugin(MousePlugin)
         .add_plugin(PausePlugin)
         .add_plugin(PalettePlugin)
         .add_plugin(TweenPlugin)
