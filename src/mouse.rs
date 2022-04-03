@@ -12,6 +12,7 @@ impl Plugin for MousePlugin {
 #[derive(Default)]
 pub struct CursorWorldPosition(pub Vec2);
 
+#[allow(clippy::only_used_in_recursion)]
 fn store_cursor_pos(
     wnds: Res<Windows>,
     q_camera: Query<(&Camera, &GlobalTransform), With<MainCamera>>,

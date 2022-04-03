@@ -3,8 +3,8 @@
 #![feature(derive_default_enum)]
 #![feature(if_let_guard)]
 #![feature(drain_filter)]
-#![feature(const_fn_trait_bound)]
 #![allow(clippy::type_complexity, clippy::too_many_arguments)]
+#![allow(dead_code)]
 
 use assets::AssetsPlugin;
 use bevy::{prelude::*, window::WindowResizeConstraints};

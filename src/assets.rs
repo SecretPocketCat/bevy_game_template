@@ -1,6 +1,6 @@
 use crate::{
     game_state::DelayedState,
-    tween::{get_fade_out_sprite_anim, get_fade_out_sprite_tween, TweenDoneAction, UiColorLens},
+    tween::{get_fade_out_sprite_anim, TweenDoneAction},
     GameState,
 };
 use bevy::{
@@ -10,7 +10,7 @@ use bevy::{
 use bevy_kira_audio::AudioSource;
 use bevy_time::*;
 use bevy_tweening::{
-    lens::SpriteColorLens, Animator, Delay, EaseFunction, Tween, TweenCompleted, TweeningType,
+    lens::SpriteColorLens, Animator, Delay, EaseFunction, Tween, TweeningType,
 };
 use dyn_fmt::AsStrFormatExt;
 use std::{ops::RangeInclusive, time::Duration};
@@ -48,12 +48,13 @@ fn start_loading_assets(mut cmd: Commands, ass: Res<AssetServer>) {
     let mut splash_entities = Vec::new();
 
     if cfg!(not(feature = "dev")) {
-        for (img_path, size) in [("sprites/bevy_logo.png", Vec2::splat(300.))].iter() {
+        {
+            let (img_path, size) = &("sprites/bevy_logo.png", Vec2::splat(300.));
             splash_entities.push(
                 cmd.spawn_bundle(SpriteBundle {
-                    texture: ass.load(*img_path).into(),
+                    texture: ass.load(*img_path),
                     sprite: Sprite {
-                        color: Color::NONE.into(),
+                        color: Color::NONE,
                         custom_size: Some(*size),
                         ..Default::default()
                     },

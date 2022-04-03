@@ -37,7 +37,7 @@ fn on_tween_completed(
         match TweenDoneAction::from(ev.user_data) {
             TweenDoneAction::None => {}
             TweenDoneAction::DespawnRecursive => {
-                if let Ok(_) = entity_q.get(ev.entity) {
+                if entity_q.get(ev.entity).is_ok() {
                     commands.entity(ev.entity).despawn_recursive();
                 }
             }

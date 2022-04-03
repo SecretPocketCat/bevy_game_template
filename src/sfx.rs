@@ -72,7 +72,7 @@ fn play_queued_sounds(
         let index = thread_rng().gen_range(ev.range.clone());
         let path = format!("audio/sfx/{}{index}.ogg", ev.file_prefix);
         let channel_key = if let Some(suffix) = ev.channel_suffix {
-            format!("{}{}", ev.file_prefix, suffix.to_string())
+            format!("{}{}", ev.file_prefix, suffix)
         } else {
             ev.file_prefix.clone()
         };

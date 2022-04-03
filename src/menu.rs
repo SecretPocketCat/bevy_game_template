@@ -6,16 +6,10 @@ use crate::tween::{delay_tween, TweenDoneAction};
 use crate::GameState;
 use crate::{assets::Fonts, tween::UiColorLens};
 use bevy::app::AppExit;
-use bevy::ecs::system::Command;
 use bevy::prelude::*;
 use bevy::ui::FocusPolicy;
-use bevy::utils::{HashMap, HashSet};
-use bevy_tweening::lens::{
-    TextColorLens, TransformPositionLens, TransformScaleLens, UiPositionLens,
-};
-use bevy_tweening::{
-    component_animator_system, Animator, EaseFunction, Lens, Tracks, Tween, TweeningType,
-};
+use bevy_tweening::lens::{TextColorLens, TransformScaleLens, UiPositionLens};
+use bevy_tweening::{component_animator_system, Animator, EaseFunction, Tween, TweeningType};
 use indexmap::IndexSet;
 use std::time::Duration;
 
@@ -297,7 +291,7 @@ fn setup_main_menu(
                         .with_children(|b| {
                             focusable_entities.insert(spawn_btn(
                                 SpawnBtnData {
-                                    text: text,
+                                    text,
                                     is_accent: *is_accent,
                                     is_focused: i == 0,
                                     action: *action,
@@ -475,8 +469,8 @@ fn handle_ui_input(
     >,
     mut focusable_q: Query<(&mut FocusState, &ButtonAction)>,
 ) {
-    for (panel_e, input, mut focusable, cancelable, parent) in panel_q.iter_mut() {
-        let any_focusables = focusable.focusable_entities.len() > 0;
+    for (_panel_e, input, mut focusable, cancelable, parent) in panel_q.iter_mut() {
+        let any_focusables = !focusable.focusable_entities.is_empty();
 
         if any_focusables && input.just_pressed(UiAction::Confirm) {
             let active_e = focusable.focusable_entities[focusable.current_focus_index];
@@ -530,7 +524,7 @@ fn on_btn_added(
     for (btn_e, btn_p) in btn_q.iter() {
         if let Ok(children) = children_q.get(btn_p.0) {
             for child in children.iter() {
-                if let Ok(_) = text_q.get(*child) {
+                if text_q.get(*child).is_ok() {
                     commands.entity(btn_e).insert(ButtonTextEntity(*child));
                 }
             }
@@ -668,7 +662,7 @@ fn spawn_settings(
     btn_style: &ButtonInteractionStyles,
 ) {
     // root
-    let submenu_root_e = spawn_panel(
+    let _submenu_root_e = spawn_panel(
         root_e,
         Some(previous_panel_e),
         vec![SpawnBtnData {
